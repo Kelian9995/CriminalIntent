@@ -34,7 +34,7 @@ class CrimeRepository private constructor(context: Context) {
             crimeDao.addCrime(crime)
         }
     }
-
+    
     companion object {
         private var INSTANCE: CrimeRepository? = null
 
