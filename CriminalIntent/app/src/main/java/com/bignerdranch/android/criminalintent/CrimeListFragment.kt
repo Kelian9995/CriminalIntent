@@ -3,9 +3,7 @@ package com.bignerdranch.android.criminalintent
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -16,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import java.util.*
 
 private const val TAG = "CrimeListFragment"
+private const val SAVED_SUBTITLE_VISIBLE = "subtitle"
 
 class CrimeListFragment : Fragment() {
 
@@ -24,7 +23,7 @@ class CrimeListFragment : Fragment() {
     private val crimeListViewModel: CrimeListViewModel by lazy {
         ViewModelProviders.of(this).get(CrimeListViewModel::class.java)
     }
-    private var callback: Callbacks? = null
+    private var callbacks: Callbacks? = null
 
     interface Callbacks {
         fun onCrimeSelected(crimeId: UUID)
@@ -32,7 +31,12 @@ class CrimeListFragment : Fragment() {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        callback = context as? Callbacks
+        callbacks = context as? Callbacks
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(
@@ -50,19 +54,45 @@ class CrimeListFragment : Fragment() {
         return view
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+    }
+
     override fun onStart() {
         super.onStart()
-        crimeListViewModel.crimeListLiveData.observe(viewLifecycleOwner, Observer { crimes ->
-            crimes?.let {
-                Log.i(TAG, "Got crimeLiveData ${crimes.size}")
-                updateUI(crimes)
+
+        crimeListViewModel.crimeListLiveData.observe(
+            viewLifecycleOwner,
+            Observer { crimes ->
+                crimes?.let {
+                    Log.i(TAG, "Got crimeLiveData ${crimes.size}")
+                    updateUI(crimes)
+                }
             }
-        })
+        )
     }
 
     override fun onDetach() {
         super.onDetach()
-        callback = null
+        callbacks = null
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.fragment_crime_list, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.new_crime -> {
+                val crime = Crime()
+                crimeListViewModel.addCrime(crime)
+                callbacks?.onCrimeSelected(crime.id)
+                true
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
     }
 
     private fun updateUI(crimes: List<Crime>) {
@@ -99,7 +129,7 @@ class CrimeListFragment : Fragment() {
         }
 
         override fun onClick(v: View) {
-            callback?.onCrimeSelected(crime.id)
+            callbacks?.onCrimeSelected(crime.id)
         }
     }
 

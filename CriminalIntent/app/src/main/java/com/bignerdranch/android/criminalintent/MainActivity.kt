@@ -3,7 +3,7 @@ package com.bignerdranch.android.criminalintent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
-import java.util.*
+import java.util.UUID
 
 class MainActivity : AppCompatActivity(), CrimeListFragment.Callbacks {
 
@@ -24,7 +24,8 @@ class MainActivity : AppCompatActivity(), CrimeListFragment.Callbacks {
 
     override fun onCrimeSelected(crimeId: UUID) {
         val fragment = CrimeFragment.newInstance(crimeId)
-        supportFragmentManager.beginTransaction()
+        supportFragmentManager
+            .beginTransaction()
             .replace(R.id.fragment_container, fragment)
             .addToBackStack(null)
             .commit()
