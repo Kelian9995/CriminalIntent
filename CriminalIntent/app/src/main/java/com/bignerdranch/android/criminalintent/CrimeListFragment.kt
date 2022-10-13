@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -14,26 +15,28 @@ import androidx.recyclerview.widget.RecyclerView
 import java.util.*
 
 private const val TAG = "CrimeListFragment"
-private const val SAVED_SUBTITLE_VISIBLE = "subtitle"
 
 class CrimeListFragment : Fragment() {
+
+    /**
+     * Required interface for hosting activities
+     */
+    interface Callbacks {
+        fun onCrimeSelected(crimeId: UUID)
+    }
+
+    private var callbacks: Callbacks? = null
 
     private lateinit var crimeRecyclerView: RecyclerView
     private var adapter: CrimeAdapter = CrimeAdapter(emptyList())
     private val crimeListViewModel: CrimeListViewModel by lazy {
         ViewModelProviders.of(this).get(CrimeListViewModel::class.java)
     }
-    private var callbacks: Callbacks? = null
 
-    interface Callbacks {
-        fun onCrimeSelected(crimeId: UUID)
-    }
-
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
-        callbacks = context as? Callbacks
+        callbacks = context as Callbacks?
     }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -56,21 +59,14 @@ class CrimeListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-    }
-
-    override fun onStart() {
-        super.onStart()
-
         crimeListViewModel.crimeListLiveData.observe(
             viewLifecycleOwner,
             Observer { crimes ->
                 crimes?.let {
-                    Log.i(TAG, "Got crimeLiveData ${crimes.size}")
+                    Log.i(TAG, "Got crimes ${crimes.size}")
                     updateUI(crimes)
                 }
-            }
-        )
+            })
     }
 
     override fun onDetach() {
@@ -94,13 +90,8 @@ class CrimeListFragment : Fragment() {
             else -> return super.onOptionsItemSelected(item)
         }
     }
-
     private fun updateUI(crimes: List<Crime>) {
-        adapter?.let {
-            it.crimes = crimes
-        } ?: run {
-            adapter = CrimeAdapter(crimes)
-        }
+        adapter = CrimeAdapter(crimes)
         crimeRecyclerView.adapter = adapter
     }
 
@@ -129,6 +120,8 @@ class CrimeListFragment : Fragment() {
         }
 
         override fun onClick(v: View) {
+            Toast.makeText(context, "${crime.title} clicked!", Toast.LENGTH_SHORT)
+                .show()
             callbacks?.onCrimeSelected(crime.id)
         }
     }
@@ -149,11 +142,5 @@ class CrimeListFragment : Fragment() {
         }
 
         override fun getItemCount() = crimes.size
-    }
-
-    companion object {
-        fun newInstance(): CrimeListFragment {
-            return CrimeListFragment()
-        }
     }
 }
