@@ -1,5 +1,6 @@
 package com.bignerdranch.android.criminalintent
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ProgressDialog.show
 import android.content.Intent
@@ -189,8 +190,6 @@ reportButton= view.findViewById(R.id.crime_report) as Button
 
         }
 
-        //return view
-
     }
 
     override fun onStop() {
@@ -265,6 +264,7 @@ reportButton= view.findViewById(R.id.crime_report) as Button
     }
 
 
+    @SuppressLint("StringFormatInvalid")
     private fun getCrimeReport(): String {
         val solvedString = if (crime.isSolved) {
             getString(R.string.crime_report_solved)
