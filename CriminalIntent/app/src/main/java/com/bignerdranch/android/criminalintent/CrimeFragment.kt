@@ -176,6 +176,19 @@ reportButton= view.findViewById(R.id.crime_report) as Button
                 startActivityForResult(captureImage, REQUEST_PHOTO)
             }
         }
+        //В CrimeFragment объект ImageView, создал его экземпляр в onCreate View,
+        // а в onStart() я устанавливаю для него OnclickListener.
+        // в этом слушателе я создаю экземпляр ZoomDialogFragment с crime.
+        // photoFileName и вызываю функцию FragmentDialog.show(…)
+
+        photoView.setOnClickListener {
+
+            val zoomDialog= ZoomDialogFragment.newInstance(crime.photoFileName)
+
+            zoomDialog.show(fragmentManager,null)
+
+        }
+
         //return view
 
     }
@@ -216,6 +229,7 @@ reportButton= view.findViewById(R.id.crime_report) as Button
         }
     }
 
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when {
             resultCode != Activity.RESULT_OK ->
@@ -249,6 +263,7 @@ reportButton= view.findViewById(R.id.crime_report) as Button
             }
         }
     }
+
 
     private fun getCrimeReport(): String {
         val solvedString = if (crime.isSolved) {
