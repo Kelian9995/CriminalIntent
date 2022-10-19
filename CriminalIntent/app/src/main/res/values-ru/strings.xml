@@ -12,7 +12,7 @@
     <string name="crime_report_solved">Дело раскрыто</string>
     <string name="crime_report_unsolved">Дело не раскрыто</string>
     <string name="crime_report_no_suspect">Нет подозреваемого.</string>
-    <string name="crime_report_suspect">Подозреваемый %s.</string>
+    <string name="crime_report_suspect">Подозреваемого %s.</string>
     <string name="crime_report_subject">Отчет о покушении на преступление</string>
     <string name="send_report">Подайте заявление о преступлении через</string>
 </resources>

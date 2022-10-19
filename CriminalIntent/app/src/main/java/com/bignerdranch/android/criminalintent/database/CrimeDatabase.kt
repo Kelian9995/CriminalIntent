@@ -7,7 +7,6 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.bignerdranch.android.criminalintent.Crime
 
-private const val DATABASE_NAME = "crime-database"
 
 @Database(entities = [ Crime::class ], version=2)
 @TypeConverters(CrimeTypeConverters::class)

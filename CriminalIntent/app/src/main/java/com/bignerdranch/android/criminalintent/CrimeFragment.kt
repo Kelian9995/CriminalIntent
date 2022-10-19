@@ -1,8 +1,6 @@
 package com.bignerdranch.android.criminalintent
 
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.ProgressDialog.show
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -13,7 +11,6 @@ import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -67,7 +64,7 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
         titleField = view.findViewById(R.id.crime_title) as EditText
         dateButton = view.findViewById(R.id.crime_date) as Button
         solvedCheckBox = view.findViewById(R.id.crime_solved) as CheckBox
-reportButton= view.findViewById(R.id.crime_report) as Button
+        reportButton= view.findViewById(R.id.crime_report) as Button
         suspectButton = view.findViewById(R.id.crime_suspect) as Button
         photoButton = view.findViewById(R.id.crime_camera) as ImageButton
         photoView=view.findViewById(R.id.crime_photo) as ImageView
@@ -78,6 +75,10 @@ reportButton= view.findViewById(R.id.crime_report) as Button
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val crimeId = arguments?.getSerializable(ARG_CRIME_ID) as UUID
+
+        crimeDetailViewModel.loadCrime(crimeId)
+
         crimeDetailViewModel.crimeLiveData.observe(
             viewLifecycleOwner,
             Observer { crime ->
@@ -138,7 +139,7 @@ reportButton= view.findViewById(R.id.crime_report) as Button
                 putExtra(Intent.EXTRA_TEXT,getCrimeReport())
                 putExtra(Intent.EXTRA_SUBJECT,getString(R.string.crime_report_subject))
             }.also { intent ->
-                var chooserIntent = Intent.createChooser(intent,
+                val chooserIntent = Intent.createChooser(intent,
                 getString(R.string.send_report))
                 startActivity(chooserIntent)
             }
@@ -210,7 +211,7 @@ reportButton= view.findViewById(R.id.crime_report) as Button
     private fun updateUI() {
         titleField.setText(crime.title)
         dateButton.text = crime.date.toString()
-        solvedCheckBox. apply {
+        solvedCheckBox.apply {
             isChecked = crime.isSolved
             jumpDrawablesToCurrentState()
         }
@@ -238,8 +239,7 @@ reportButton= view.findViewById(R.id.crime_report) as Button
                 // Указать для каких полей ваш запрос должен возращять значения
                 val queryFields = arrayOf(ContactsContract.Contacts.DISPLAY_NAME)
                 //Выполняемый здесь запрос contactUri похож на предложение Where
-                val cursor = requireActivity().contentResolver
-                    .query(contactUri,queryFields, null, null, null)
+                val cursor = requireActivity().contentResolver.query(contactUri,queryFields, null, null, null)
                 cursor?.use {
                     // Vertify cursor contains at least one result
                             if (it.count == 0) {
@@ -263,8 +263,6 @@ reportButton= view.findViewById(R.id.crime_report) as Button
         }
     }
 
-
-    @SuppressLint("StringFormatInvalid")
     private fun getCrimeReport(): String {
         val solvedString = if (crime.isSolved) {
             getString(R.string.crime_report_solved)
@@ -276,9 +274,9 @@ reportButton= view.findViewById(R.id.crime_report) as Button
             getString(R.string.crime_report_no_suspect)
 
         } else {
-            getString(R.string.crime_report_subject, crime.suspect)
+            getString(R.string.crime_report_suspect, crime.suspect)
         }
-            return getString(R.string.crime_report, crime_title, dateString,
+            return getString(R.string.crime_report, crime.title, dateString,
                 solvedString, suspect)
         }
 
